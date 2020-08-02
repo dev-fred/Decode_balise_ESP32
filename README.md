@@ -1,6 +1,6 @@
 # Decode_balise_ESP32
 
-Decodes the beacon frame emitted by a GPS tracker : project https://github.com/khancyr/TTGO_T_BEAM and send result to a serial console:
+Decodes the beacon frame emitted by a GPS tracker : project https://github.com/khancyr/TTGO_T_BEAM and send result to a serial console (eg: OTG cable + https://play.google.com/store/apps/details?id=de.kai_morich.serial_usb_terminal) :
 len=137 ID: ILLEGAL_DRONE_APPELEZ_POLICE17 LAT: 28.78126 LON: -3.03463 ALT ABS: 40 HAUTEUR: 48 LAT DEP: 28.78134 LON DEP: -3.03450 VITESSE HOR: 0 DIR: 1
 
 The code is derivated from https://github.com/f5soh/decode_balise, an ESP8266 version.

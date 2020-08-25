@@ -38,7 +38,7 @@ static constexpr uint8_t TLV_LENGTH[] {
   4,  // [DATA_TYPE::HOME_LATITUDE]
   4,  // [DATA_TYPE::HOME_LONGITUDE]
   1,  // [DATA_TYPE::GROUND_SPEED]
-  1,  // [DATA_TYPE::HEADING]
+  2,  // [DATA_TYPE::HEADING]
 };
 
 

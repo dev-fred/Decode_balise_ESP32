@@ -76,8 +76,7 @@ typedef struct {
 static esp_err_t event_handler(void *ctx, system_event_t *event);
 static void wifi_sniffer_init(void);
 static void wifi_sniffer_set_channel(uint8_t channel);
-static const char *wifi_sniffer_packet_type2str(wifi_promiscuous_pkt_type_t type);
-static void wifi_sniffer_packet_handler(void *buff, wifi_promiscuous_pkt_type_t type);
+
 
 esp_err_t event_handler(void *ctx, system_event_t *event)
 {
@@ -161,8 +160,7 @@ static void printAltitude(uint16_t start, int len, uint16_t size, uint8_t* data)
 void beaconCallback(void* buf, wifi_promiscuous_pkt_type_t type)
 {
   wifi_promiscuous_pkt_t *snifferPacket = (wifi_promiscuous_pkt_t*)buf;
-  WifiMgmtHdr *frameControl = (WifiMgmtHdr*)snifferPacket->payload;
-  wifi_pkt_rx_ctrl_t ctrl = (wifi_pkt_rx_ctrl_t)snifferPacket->rx_ctrl;
+
   int len = snifferPacket->rx_ctrl.sig_len;
   uint8_t SSID_length = (int)snifferPacket->payload[40];
   uint8_t offset_OUI = 42+SSID_length;
@@ -174,9 +172,7 @@ void beaconCallback(void* buf, wifi_promiscuous_pkt_type_t type)
   return;
   
   len -= 4;
-  int fctl = ntohs(frameControl->fctl);
-  const wifi_ieee80211_packet_t *ipkt = (wifi_ieee80211_packet_t *)snifferPacket->payload;
-  const WifiMgmtHdr *hdr = &ipkt->hdr;
+ 
   
   // If we dont the buffer size is not 0, don't write or else we get CORRUPT_HEAP
   if (snifferPacket->payload[0] == 0x80)

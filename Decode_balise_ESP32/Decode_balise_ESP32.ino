@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #include <esp_wifi.h>
 #include <esp_event_loop.h>
 #include <nvs_flash.h>
@@ -77,20 +78,6 @@ esp_err_t event_handler(void *ctx, system_event_t *event)
   return ESP_OK;
 }
 
-void wifi_sniffer_init(void)
-{
-  nvs_flash_init();
-  tcpip_adapter_init();
-  ESP_ERROR_CHECK( esp_event_loop_init(event_handler, NULL) );
-  wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
-  ESP_ERROR_CHECK( esp_wifi_init(&cfg) );
-  ESP_ERROR_CHECK( esp_wifi_set_storage(WIFI_STORAGE_RAM) );
-  ESP_ERROR_CHECK( esp_wifi_set_mode(WIFI_MODE_NULL) );
-  ESP_ERROR_CHECK( esp_wifi_start() );
-  esp_wifi_set_promiscuous(true);
-  esp_wifi_set_promiscuous_rx_cb(&beaconCallback);
-}
-
 void wifi_sniffer_set_channel(uint8_t channel)
 {
   esp_wifi_set_channel(channel, WIFI_SECOND_CHAN_NONE);
@@ -151,8 +138,7 @@ static void printAltitude(uint16_t start, int len, uint16_t size, uint8_t* data)
 void beaconCallback(void* buf, wifi_promiscuous_pkt_type_t type)
 {
   wifi_promiscuous_pkt_t *snifferPacket = (wifi_promiscuous_pkt_t*)buf;
-  WifiMgmtHdr *frameControl = (WifiMgmtHdr*)snifferPacket->payload;
-  wifi_pkt_rx_ctrl_t ctrl = (wifi_pkt_rx_ctrl_t)snifferPacket->rx_ctrl;
+
   int len = snifferPacket->rx_ctrl.sig_len;
   uint8_t SSID_length = (int)snifferPacket->payload[40];
   uint8_t offset_OUI = 42+SSID_length;
@@ -164,9 +150,7 @@ void beaconCallback(void* buf, wifi_promiscuous_pkt_type_t type)
   return;
   
   len -= 4;
-  int fctl = ntohs(frameControl->fctl);
-  const wifi_ieee80211_packet_t *ipkt = (wifi_ieee80211_packet_t *)snifferPacket->payload;
-  const WifiMgmtHdr *hdr = &ipkt->hdr;
+
   
   // If we dont the buffer size is not 0, don't write or else we get CORRUPT_HEAP
   if (snifferPacket->payload[0] == 0x80)
@@ -201,6 +185,20 @@ void beaconCallback(void* buf, wifi_promiscuous_pkt_type_t type)
     Serial.print(" DIR: "); printAltitude(offset, len, TLV_LENGTH[HEADING] , snifferPacket->payload); 
     Serial.println();
   }
+}
+
+void wifi_sniffer_init(void)
+{
+  nvs_flash_init();
+  tcpip_adapter_init();
+  ESP_ERROR_CHECK( esp_event_loop_init(event_handler, NULL) );
+  wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
+  ESP_ERROR_CHECK( esp_wifi_init(&cfg) );
+  ESP_ERROR_CHECK( esp_wifi_set_storage(WIFI_STORAGE_RAM) );
+  ESP_ERROR_CHECK( esp_wifi_set_mode(WIFI_MODE_NULL) );
+  ESP_ERROR_CHECK( esp_wifi_start() );
+  esp_wifi_set_promiscuous(true);
+  esp_wifi_set_promiscuous_rx_cb(&beaconCallback);
 }
 
 // the setup function runs once when you press reset or power the board

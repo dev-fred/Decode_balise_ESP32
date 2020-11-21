@@ -6,9 +6,11 @@ len=137 ID: ILLEGAL_DRONE_APPELEZ_POLICE17 LAT: 28.78126 LON: -3.03463 ALT ABS: 
 Le code, dérivé de la version ESP8266 https://github.com/f5soh/decode_balise , est implémenté sur un ESP32 ce qui permet de décoder toute la trame .
 Le code est basé sur https://github.com/ESP-EOS/ESP32-WiFi-Sniffer et https://github.com/justcallmekoko/ESP32Marauder/search?q=beaconSnifferCallback&unscoped_q=beaconSnifferCallback
 
-On ajoutera l'URL https://dl.espressif.com/dl/package_esp32_index.json dans le Gestionnnaire de carte supplémentaire sous Fichier/Préférences/Paramètres
+On ajoutera l'URL https://dl.espressif.com/dl/package_esp32_index.json dans le Gestionnnaire de carte supplémentaire sous Fichier->Préférences->Paramètres
 
-Outils:
+Dans Outils->Gestionnaire de carte: installer "esp32"
+
+Choisir dans l'onglet Outils:
 Type de carte: ESP32 Dev Module
 Partition Scheme: No OTA (2MB APP/2MB SPIFFS)
 

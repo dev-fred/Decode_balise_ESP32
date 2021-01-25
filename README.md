@@ -1,3 +1,9 @@
+# Decode_Balise_ESP32_TFT
+
+Durant la mise au point des balises, voici un outil bien pratique basé sur une carte TTGO T-Display ESP32 décrite ici http://www.lilygo.cn/prod_view.aspx?TypeId=50033&Id=1126&FId=t3:50033:3
+
+<img src="./Decode_Balise_ESP32_TFT/Capture.PNG" width = "300">
+
 # Decode_balise_ESP32
 
 Décode la trame de la balise émise par un tracker GPS  : project https://github.com/khancyr/TTGO_T_BEAM et envoie le résultat à une console série via un cable OTG + https://play.google.com/store/apps/details?id=de.kai_morich.serial_usb_terminal) :

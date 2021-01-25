@@ -8,9 +8,6 @@
 #include <BluetoothSerial.h>
 
 
-BluetoothSerial BT; //Object for Bluetooth
-
-
 TFT_eSPI tft = TFT_eSPI();  // Invoke library, pins defined in User_Setup.h
 
 #define TFT_GREY 0x5AEB // New colour

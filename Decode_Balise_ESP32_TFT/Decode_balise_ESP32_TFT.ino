@@ -1,15 +1,24 @@
-#include <Arduino.h>
+/*   Decode la trame beacon d'un balise 
+  *  Affiche le résultat sur le TFT d'une carte ESP32 TTGO-T-Display et sur le port série 
+  *  Compilation avec carte ESP32 Dev Module
+*/
+
 #include <esp_wifi.h>
 #include <esp_event_loop.h>
 #include <nvs_flash.h>
-#include <TFT_eSPI.h> // Graphics and font library for ST7735 driver chip
-#include <SPI.h>
-#include <Button2.h>
 #include <BluetoothSerial.h>
 
+/*
+  * Charger TFT_eSPI-master.zip depuis https://github.com/Bodmer/TFT_eSPI
+  * Copier TFT_eSPI sous libraries
+  * Dans le fichier libraries\TFT_eSPI\User_Setup_Select.h décommenter la ligne #include <User_Setups/Setup25_TTGO_T_Display.h>
+*/
 
-BluetoothSerial BT; //Object for Bluetooth
-
+//Driver carte TTGO T-Display
+#define ST7789_DRIVER
+#include <TFT_eSPI.h> // Graphics and font library
+#include <SPI.h>
+#include <Button2.h>
 
 TFT_eSPI tft = TFT_eSPI();  // Invoke library, pins defined in User_Setup.h
 
@@ -93,12 +102,27 @@ typedef struct {
 static esp_err_t event_handler(void *ctx, system_event_t *event);
 static void wifi_sniffer_init(void);
 static void wifi_sniffer_set_channel(uint8_t channel);
+static const char *wifi_sniffer_packet_type2str(wifi_promiscuous_pkt_type_t type);
+static void wifi_sniffer_packet_handler(void *buff, wifi_promiscuous_pkt_type_t type);
 
 esp_err_t event_handler(void *ctx, system_event_t *event)
 {
 	return ESP_OK;
 }
 
+void wifi_sniffer_init(void)
+{
+	nvs_flash_init();
+	tcpip_adapter_init();
+	ESP_ERROR_CHECK( esp_event_loop_init(event_handler, NULL) );
+	wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
+	ESP_ERROR_CHECK( esp_wifi_init(&cfg) );
+	ESP_ERROR_CHECK( esp_wifi_set_storage(WIFI_STORAGE_RAM) );
+	ESP_ERROR_CHECK( esp_wifi_set_mode(WIFI_MODE_NULL) );
+	ESP_ERROR_CHECK( esp_wifi_start() );
+	esp_wifi_set_promiscuous(true);
+	esp_wifi_set_promiscuous_rx_cb(&beaconCallback);
+}
 
 void wifi_sniffer_set_channel(uint8_t channel)
 {
@@ -163,6 +187,8 @@ static void printAltitude(uint16_t start, int len, uint16_t size, uint8_t* data)
 void beaconCallback(void* buf, wifi_promiscuous_pkt_type_t type)
 {
 	wifi_promiscuous_pkt_t *snifferPacket = (wifi_promiscuous_pkt_t*)buf;
+	WifiMgmtHdr *frameControl = (WifiMgmtHdr*)snifferPacket->payload;
+	wifi_pkt_rx_ctrl_t ctrl = (wifi_pkt_rx_ctrl_t)snifferPacket->rx_ctrl;
 	int len = snifferPacket->rx_ctrl.sig_len;
 	uint8_t SSID_length = (int)snifferPacket->payload[40];
 	uint8_t offset_OUI = 42+SSID_length;
@@ -174,8 +200,11 @@ void beaconCallback(void* buf, wifi_promiscuous_pkt_type_t type)
 	return;
 	
 	len -= 4;
+	int fctl = ntohs(frameControl->fctl);
+	const wifi_ieee80211_packet_t *ipkt = (wifi_ieee80211_packet_t *)snifferPacket->payload;
+	const WifiMgmtHdr *hdr = &ipkt->hdr;
 	
-		// If we dont the buffer size is not 0, don't write or else we get CORRUPT_HEAP
+	// If we dont the buffer size is not 0, don't write or else we get CORRUPT_HEAP
 	if (snifferPacket->payload[0] == 0x80)
 	{
 		tft.fillScreen(TFT_BLACK);
@@ -231,20 +260,6 @@ void beaconCallback(void* buf, wifi_promiscuous_pkt_type_t type)
 		delay(tempo);
 
 	}
-}
-
-void wifi_sniffer_init(void)
-{
-	nvs_flash_init();
-	tcpip_adapter_init();
-	ESP_ERROR_CHECK( esp_event_loop_init(event_handler, NULL) );
-	wifi_init_config_t cfg = WIFI_INIT_CONFIG_DEFAULT();
-	ESP_ERROR_CHECK( esp_wifi_init(&cfg) );
-	ESP_ERROR_CHECK( esp_wifi_set_storage(WIFI_STORAGE_RAM) );
-	ESP_ERROR_CHECK( esp_wifi_set_mode(WIFI_MODE_NULL) );
-	ESP_ERROR_CHECK( esp_wifi_start() );
-	esp_wifi_set_promiscuous(true);
-	esp_wifi_set_promiscuous_rx_cb(&beaconCallback);
 }
 
 // the setup function runs once when you press reset or power the board

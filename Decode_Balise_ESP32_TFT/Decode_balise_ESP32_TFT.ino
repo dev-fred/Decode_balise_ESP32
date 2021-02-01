@@ -33,7 +33,7 @@ int pos = 0;
 Button2 btn1(BUTTON_1);
 Button2 btn2(BUTTON_2);
 
-int tempo = 1000;
+int tempo = 0;
 
 /**
 	* Enumeration des types de données à envoyer

@@ -2,7 +2,7 @@
 
 Durant la mise au point des balises, voici un outil bien pratique basé sur une carte TTGO T-Display ESP32 décrite ici http://www.lilygo.cn/prod_view.aspx?TypeId=50033&Id=1126&FId=t3:50033:3
 
-<img src="./Decode_Balise_ESP32_TFT/Capture.PNG" width = "300">
+<img src="./Decode_Balise_ESP32_TFT/TTGOCapture1.png" width = "300">
 
 # Decode_balise_ESP32
 

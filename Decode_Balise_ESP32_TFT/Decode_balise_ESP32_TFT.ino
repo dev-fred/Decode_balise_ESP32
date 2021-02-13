@@ -35,6 +35,43 @@ Button2 btn2(BUTTON_2);
 
 int tempo = 0;
 
+static const char* const WIFI_PHY_RATE[] = 
+{
+  "1_Mbps_with_long_preamble",
+  "2_Mbps_with_long_preamble",
+  "5.5_Mbps_with_long_preamble",
+  "11_Mbps_with_long_preamble",
+  "",
+  "2_Mbps_with_short_preamble",
+  "5.5_Mbps_with_short_preamble",
+  "11_Mbps_with_short_preamble",
+  "48_Mbps",
+  "24_Mbps",
+  "12_Mbps",
+  "6_Mbps",
+  "54_Mbps",
+  "36_Mbps",
+  "18_Mbps",
+  "9_Mbps",
+  "MCS0_with_long_GI,_6.5_Mbps_for_20MHz,_13.5_Mbps_for_40MHz",
+  "MCS1_with_long_GI,_13_Mbps_for_20MHz,_27_Mbps_for_40MHz",
+  "MCS2_with_long_GI,_19.5_Mbps_for_20MHz,_40.5_Mbps_for_40MHz",
+  "MCS3_with_long_GI,_26_Mbps_for_20MHz,_54_Mbps_for_40MHz",
+  "MCS4_with_long_GI,_39_Mbps_for_20MHz,_81_Mbps_for_40MHz",
+  "MCS5_with_long_GI,_52_Mbps_for_20MHz,_108_Mbps_for_40MHz",
+  "MCS6_with_long_GI,_58.5_Mbps_for_20MHz,_121.5_Mbps_for_40MHz",
+  "MCS7_with_long_GI,_65_Mbps_for_20MHz,_135_Mbps_for_40MHz",
+  "MCS7_with_short_GI,_72.2_Mbps_for_20MHz,_150_Mbps_for_40MHz",
+  "250_Kbps_LORA",
+  "500_Kbps_LORA",
+};
+
+static const char* const WIFI_CBW[] = 
+{
+  "20MHz",
+  "40MHz",
+};
+
 /**
 	* Enumeration des types de données à envoyer
 */
@@ -214,7 +251,7 @@ void beaconCallback(void* buf, wifi_promiscuous_pkt_type_t type)
     tft.print(tempo);tft.print("mS");
     tft.setTextSize(2);
 		// ID balise
-		snprintf(buff[0], sizeof(buff[0])," ID: ");
+		snprintf(buff[0], sizeof(buff[0]),"ID: ");
 		tft.print(buff[0]);Serial.print(buff[0]);  printDataSpan(offset_OUI+4+6, len, TLV_LENGTH[ID_FR] , snifferPacket->payload);
 		uint16_t offset = offset_OUI+4+6+TLV_LENGTH[ID_FR]+2; // +2 : Type + Length
 		
@@ -237,6 +274,7 @@ void beaconCallback(void* buf, wifi_promiscuous_pkt_type_t type)
 		snprintf(buff[0], sizeof(buff[0])," HAUTEUR: ");
 		tft.print(buff[0]);Serial.print(" HAUTEUR: "); printAltitude(offset, len, TLV_LENGTH[HEIGTH] , snifferPacket->payload); 
 		offset += TLV_LENGTH[HEIGTH]+2;
+    Serial.println(); 
 		
 		//home latitude
 		snprintf(buff[0], sizeof(buff[0])," LAT DEP: ");
@@ -256,8 +294,14 @@ void beaconCallback(void* buf, wifi_promiscuous_pkt_type_t type)
 		//heading
 		snprintf(buff[0], sizeof(buff[0])," DIR: ");
 		tft.print(buff[0]);Serial.print(" DIR: "); printAltitude(offset, len, TLV_LENGTH[HEADING] , snifferPacket->payload);
-    Serial.println(); 
-		delay(tempo);
+    Serial.println();
+     
+    //infos wifi
+    Serial.print("RSSI=");Serial.print(snifferPacket->rx_ctrl.rssi);
+    Serial.print(" Largeur=");Serial.print(WIFI_CBW[snifferPacket->rx_ctrl.cwb]);
+    Serial.print(" Rate=");Serial.print(WIFI_PHY_RATE[snifferPacket->rx_ctrl.rate]);
+    Serial.print(" Canal=");Serial.println(snifferPacket->rx_ctrl.channel);
+    delay(tempo);
 
 	}
 }

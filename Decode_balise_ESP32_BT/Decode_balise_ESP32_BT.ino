@@ -168,7 +168,7 @@ void beaconCallback(void* buf, wifi_promiscuous_pkt_type_t type)
   const uint8_t FRAME_OUI[3] = {0x6A, 0x5C, 0x35};
   
   //Filter OUI from 6A:5C:35
-  if(snifferPacket->payload[offset_OUI+1] != FRAME_OUI[0] && snifferPacket->payload[offset_OUI+2] != FRAME_OUI[1] && snifferPacket->payload[offset_OUI+3] != FRAME_OUI[2])
+  if(snifferPacket->payload[offset_OUI+1] != FRAME_OUI[0] || snifferPacket->payload[offset_OUI+2] != FRAME_OUI[1] || snifferPacket->payload[offset_OUI+3] != FRAME_OUI[2])
   return;
   
   len -= 4;
